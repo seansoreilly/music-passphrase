@@ -16,6 +16,7 @@ const Index = () => {
   const [addNumber, setAddNumber] = useState(true);
   const [addSpecialChar, setAddSpecialChar] = useState(true);
   const [includeSpaces, setIncludeSpaces] = useState(true);
+  const [length, setLength] = useState(10);
   const [passphrases, setPassphrases] = useState<string[]>([]);
   const [editedPassphrases, setEditedPassphrases] = useState<string[]>([]);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -75,6 +76,10 @@ const Index = () => {
     if (savedIncludeSpaces) {
       setIncludeSpaces(JSON.parse(savedIncludeSpaces));
     }
+    const savedLength = localStorage.getItem("musicPassphrase_length");
+    if (savedLength) {
+      setLength(JSON.parse(savedLength));
+    }
   }, []);
 
   // Save state to localStorage
@@ -92,7 +97,11 @@ const Index = () => {
       "musicPassphrase_includeSpaces",
       JSON.stringify(includeSpaces)
     );
-  }, [keywords, addNumber, addSpecialChar, includeSpaces]);
+    localStorage.setItem(
+      "musicPassphrase_length",
+      JSON.stringify(length)
+    );
+  }, [keywords, addNumber, addSpecialChar, includeSpaces, length]);
 
   const handleGenerateClick = () => {
     if (!keywords.trim()) {
@@ -108,6 +117,7 @@ const Index = () => {
       addNumber,
       addSpecialChar,
       includeSpaces,
+      length,
     });
   };
 
@@ -281,6 +291,31 @@ const Index = () => {
                   <Space className="h-3.5 w-3.5" />
                   Spaces
                 </button>
+              </div>
+
+              {/* Length Control */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm font-medium text-purple-900/70">
+                    Length
+                  </Label>
+                  <span className="text-sm font-semibold text-purple-500 tabular-nums">
+                    {length} characters
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={5}
+                  max={20}
+                  value={length}
+                  onChange={(e) => setLength(Number(e.target.value))}
+                  disabled={mutation.isPending}
+                  className="w-full h-2 rounded-full appearance-none cursor-pointer bg-purple-100 accent-purple-400"
+                />
+                <div className="flex justify-between text-xs text-purple-300">
+                  <span>5</span>
+                  <span>20</span>
+                </div>
               </div>
 
               {/* Generate Button */}

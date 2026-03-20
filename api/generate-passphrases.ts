@@ -10,6 +10,7 @@ interface RequestBody {
   addNumber: boolean;
   addSpecialChar: boolean;
   includeSpaces: boolean;
+  length: number;
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -32,7 +33,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const { keywords, addNumber, addSpecialChar, includeSpaces }: RequestBody = req.body;
+    const { keywords, addNumber, addSpecialChar, includeSpaces, length }: RequestBody = req.body;
+    const charCount = Math.min(Math.max(length || 10, 5), 20);
 
     if (!keywords || keywords.trim().length === 0) {
       return res.status(400).json({ error: 'Keywords are required' });
@@ -42,7 +44,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(500).json({ error: 'Groq API key not configured' });
     }
 
-    const prompt = `Generate 5 unique short phrases (MINIMUM 4 words, maximum 10 words each) from the artist "${keywords.trim()}".
+    const prompt = `Generate 5 unique short phrases (approximately ${charCount} characters each, including spaces) from the artist "${keywords.trim()}".
 
     Requirements:
     - Use ACTUAL CONSECUTIVE WORDS from published song titles
@@ -103,24 +105,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       
       // Ensure first letter is capitalized and rest are lowercase
       processed = processed.charAt(0).toUpperCase() + processed.slice(1).toLowerCase();
-      
+
       // Remove spaces if includeSpaces is false
       if (!includeSpaces) {
         processed = processed.replace(/\s+/g, '');
       }
-      
+
+      // Calculate suffix length to reserve space
+      let suffix = '';
       if (addNumber) {
         const randomNumber = Math.floor(Math.random() * 90) + 10; // 10-99
-        processed += includeSpaces ? ` ${randomNumber}` : randomNumber;
+        suffix += includeSpaces ? ` ${randomNumber}` : `${randomNumber}`;
       }
-      
       if (addSpecialChar) {
         const specialChars = ['!', '@', '#', '$', '%', '&', '*', '?'];
-        const randomChar = specialChars[Math.floor(Math.random() * specialChars.length)];
-        processed += randomChar;
+        suffix += specialChars[Math.floor(Math.random() * specialChars.length)];
       }
-      
-      return processed;
+
+      // Truncate base text to fit within charCount including suffix
+      const maxBase = charCount - suffix.length;
+      if (processed.length > maxBase) {
+        processed = processed.slice(0, maxBase).replace(/\s+$/, '');
+      }
+
+      return processed + suffix;
     });
 
     console.log('Processed passphrases:', processedPassphrases);

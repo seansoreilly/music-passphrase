@@ -3,6 +3,7 @@ interface RequestBody {
   addNumber: boolean;
   addSpecialChar: boolean;
   includeSpaces: boolean;
+  length: number;
 }
 
 interface ApiResponse {
@@ -13,14 +14,14 @@ interface ApiResponse {
 }
 
 export async function generatePassphrases(requestBody: RequestBody): Promise<string[]> {
-  const { keywords, addNumber, addSpecialChar, includeSpaces } = requestBody;
+  const { keywords, addNumber, addSpecialChar, includeSpaces, length } = requestBody;
 
   if (!keywords || keywords.trim().length === 0) {
     throw new Error('Keywords are required');
   }
 
   console.log('Generating passphrases for keywords:', keywords);
-  console.log('Options:', { addNumber, addSpecialChar, includeSpaces });
+  console.log('Options:', { addNumber, addSpecialChar, includeSpaces, length });
 
   try {
     const response = await fetch('/api/generate-passphrases', {
@@ -33,6 +34,7 @@ export async function generatePassphrases(requestBody: RequestBody): Promise<str
         addNumber,
         addSpecialChar,
         includeSpaces,
+        length,
       }),
     });
 
@@ -53,14 +55,14 @@ export async function generatePassphrases(requestBody: RequestBody): Promise<str
     
     // If there's an issue with the API, fall back to mock implementation
     console.log('Falling back to mock implementation...');
-    const mockPassphrases = generateMockPassphrases(keywords, addNumber, addSpecialChar, includeSpaces);
+    const mockPassphrases = generateMockPassphrases(keywords, addNumber, addSpecialChar, includeSpaces, length);
     return mockPassphrases;
   }
 }
 
-function generateMockPassphrases(keywords: string, addNumber: boolean, addSpecialChar: boolean, includeSpaces: boolean): string[] {
+function generateMockPassphrases(keywords: string, addNumber: boolean, addSpecialChar: boolean, includeSpaces: boolean, length: number): string[] {
   const keywordLower = keywords.toLowerCase();
-  
+
   // Generate more creative mock passphrases based on keywords
   const baseTemplates = [
     `bright ${keywordLower} morning coffee ritual`,
@@ -82,23 +84,29 @@ function generateMockPassphrases(keywords: string, addNumber: boolean, addSpecia
 
   return selectedTemplates.map(template => {
     let passphrase = template.charAt(0).toUpperCase() + template.slice(1);
-    
+
     // Remove spaces if includeSpaces is false
     if (!includeSpaces) {
       passphrase = passphrase.replace(/\s+/g, '');
     }
-    
+
+    // Build suffix first so we can reserve space
+    let suffix = '';
     if (addNumber) {
-      const randomNumber = Math.floor(Math.random() * 90) + 10; // 10-99
-      passphrase += includeSpaces ? ` ${randomNumber}` : randomNumber;
+      const randomNumber = Math.floor(Math.random() * 90) + 10;
+      suffix += includeSpaces ? ` ${randomNumber}` : `${randomNumber}`;
     }
-    
     if (addSpecialChar) {
       const specialChars = ['!', '@', '#', '$', '%', '&', '*', '?'];
-      const randomChar = specialChars[Math.floor(Math.random() * specialChars.length)];
-      passphrase += randomChar;
+      suffix += specialChars[Math.floor(Math.random() * specialChars.length)];
     }
-    
-    return passphrase;
+
+    // Truncate base text to fit within length including suffix
+    const maxBase = length - suffix.length;
+    if (passphrase.length > maxBase) {
+      passphrase = passphrase.slice(0, maxBase).replace(/\s+$/, '');
+    }
+
+    return passphrase + suffix;
   });
 }
