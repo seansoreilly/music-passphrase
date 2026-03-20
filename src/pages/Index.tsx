@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Loader2, Copy, Check, AlertCircle, Edit2 } from "lucide-react";
+import { Loader2, Copy, Check, Edit2, Music, Sparkles, Hash, AtSign, Space } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { generatePassphrases } from "@/api/generate";
 import { BuildInfo, DevelopmentBuildInfo } from "@/components/BuildInfo";
@@ -184,222 +184,191 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Pastel background blobs */}
+      <div className="fixed inset-0 bg-blob-1 pointer-events-none" />
+      <div className="fixed inset-0 bg-blob-2 pointer-events-none" />
+      <div className="fixed inset-0 bg-blob-3 pointer-events-none" />
+
+      <div className="relative z-10 max-w-2xl mx-auto px-4 py-12">
         {/* Header */}
-        <div className="text-center mb-8 pt-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-200 to-pink-200 mb-5 shadow-sm">
+            <Music className="h-8 w-8 text-purple-500" />
+          </div>
+          <h1 className="font-display text-5xl font-bold tracking-tight bg-gradient-to-r from-purple-400 via-pink-400 to-orange-300 bg-clip-text text-transparent mb-3">
             Music Passphrase
           </h1>
-          <p className="text-gray-600 text-lg">
-            Generate secure passphrases from your favorite music artists with AI
+          <p className="text-muted-foreground text-lg font-light max-w-md mx-auto">
+            Turn your favorite artists into secure, memorable passphrases
           </p>
         </div>
 
-        {/* Info Banner */}
-        {/* <Card className="mb-6 border-green-200 bg-green-50/50">
-          <CardContent className="p-4">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="h-5 w-5 text-green-600 mt-0.5 shrink-0" />
-              <div className="text-sm text-green-800">
-                <p className="font-medium mb-1">Groq API Integration</p>
-                <p>
-                  This application now uses the Groq API to generate
-                  passphrases. To use the real API, add your GROQ_API_KEY to
-                  your Vercel environment variables. Falls back to mock data if
-                  API is unavailable.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card> */}
-
-        {/* Input Section */}
-        <Card className="mb-8 shadow-lg border-0 bg-white/70 backdrop-blur-sm">
-          <CardContent className="p-6">
+        {/* Input Card */}
+        <Card className="mb-6 shadow-xl shadow-purple-100/50 border border-purple-100/60 bg-white/60 backdrop-blur-xl rounded-2xl">
+          <CardContent className="p-8">
             <div className="space-y-6">
-              {/* Keywords Input */}
+              {/* Artist Input */}
               <div className="space-y-2">
                 <Label
                   htmlFor="keywords"
-                  className="text-sm font-medium text-gray-700"
+                  className="text-sm font-medium text-purple-900/70"
                 >
-                  Enter music artist name
+                  Artist name
                 </Label>
-                <Input
-                  id="keywords"
-                  value={keywords}
-                  onChange={(e) => setKeywords(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Enter music artist (e.g., Taylor Swift, The Beatles)"
-                  className="h-14 border-gray-200 focus:border-purple-500 focus:ring-purple-500"
-                  style={{ fontSize: "1.3rem" }}
-                  disabled={mutation.isPending}
-                />
+                <div className="relative">
+                  <Music className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-purple-300" />
+                  <Input
+                    id="keywords"
+                    value={keywords}
+                    onChange={(e) => setKeywords(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Taylor Swift, The Beatles..."
+                    className="h-14 pl-12 rounded-xl border-purple-200/60 bg-white/80 focus:border-purple-300 focus:ring-purple-200 placeholder:text-purple-300/60"
+                    style={{ fontSize: "1.15rem" }}
+                    disabled={mutation.isPending}
+                  />
+                </div>
               </div>
 
-              {/* Options */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="flex items-center space-x-3">
-                  <Switch
-                    id="add-number"
-                    checked={addNumber}
-                    onCheckedChange={(checked) => {
-                      setAddNumber(checked);
-                      track("toggle_option", {
-                        option_name: "numbers",
-                        option_state: checked,
-                      });
-                    }}
-                    disabled={mutation.isPending}
-                    aria-label="Include Numbers"
-                  />
-                  <Label htmlFor="add-number" className="text-gray-700">
-                    Include Numbers
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Switch
-                    id="add-special-char"
-                    checked={addSpecialChar}
-                    onCheckedChange={(checked) => {
-                      setAddSpecialChar(checked);
-                      track("toggle_option", {
-                        option_name: "symbols",
-                        option_state: checked,
-                      });
-                    }}
-                    disabled={mutation.isPending}
-                    aria-label="Include Special Characters"
-                  />
-                  <Label htmlFor="add-special-char" className="text-gray-700">
-                    Include Special Characters
-                  </Label>
-                </div>
-
-                <div className="flex items-center space-x-3">
-                  <Switch
-                    id="include-spaces"
-                    checked={includeSpaces}
-                    onCheckedChange={(checked) => {
-                      setIncludeSpaces(checked);
-                      track("toggle_option", {
-                        option_name: "spaces",
-                        option_state: checked,
-                      });
-                    }}
-                    disabled={mutation.isPending}
-                    aria-label="Include Spaces"
-                  />
-                  <Label
-                    htmlFor="include-spaces"
-                    className="text-sm font-medium text-gray-700"
-                  >
-                    Include spaces
-                  </Label>
-                </div>
+              {/* Option Pills */}
+              <div className="flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAddNumber(!addNumber);
+                    track("toggle_option", { option_name: "numbers", option_state: !addNumber });
+                  }}
+                  disabled={mutation.isPending}
+                  className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
+                    addNumber
+                      ? "bg-purple-100 text-purple-700 ring-1 ring-purple-200 shadow-sm"
+                      : "bg-gray-50 text-gray-400 hover:bg-gray-100"
+                  }`}
+                >
+                  <Hash className="h-3.5 w-3.5" />
+                  Numbers
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAddSpecialChar(!addSpecialChar);
+                    track("toggle_option", { option_name: "symbols", option_state: !addSpecialChar });
+                  }}
+                  disabled={mutation.isPending}
+                  className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
+                    addSpecialChar
+                      ? "bg-pink-100 text-pink-700 ring-1 ring-pink-200 shadow-sm"
+                      : "bg-gray-50 text-gray-400 hover:bg-gray-100"
+                  }`}
+                >
+                  <AtSign className="h-3.5 w-3.5" />
+                  Symbols
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIncludeSpaces(!includeSpaces);
+                    track("toggle_option", { option_name: "spaces", option_state: !includeSpaces });
+                  }}
+                  disabled={mutation.isPending}
+                  className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
+                    includeSpaces
+                      ? "bg-orange-100 text-orange-700 ring-1 ring-orange-200 shadow-sm"
+                      : "bg-gray-50 text-gray-400 hover:bg-gray-100"
+                  }`}
+                >
+                  <Space className="h-3.5 w-3.5" />
+                  Spaces
+                </button>
               </div>
 
               {/* Generate Button */}
-              <div className="mt-6">
-                <Button
-                  onClick={handleGenerateClick}
-                  disabled={mutation.isPending}
-                  className="w-full h-14 text-lg font-bold bg-purple-600 hover:bg-purple-700 text-white transition-all duration-300 transform "
-                >
-                  {mutation.isPending ? (
-                    <Loader2 className="mr-2 h-6 w-6 animate-spin" />
-                  ) : null}
-                  Generate Passphrases
-                </Button>
-              </div>
+              <Button
+                onClick={handleGenerateClick}
+                disabled={mutation.isPending}
+                className="w-full h-14 text-base font-semibold rounded-xl bg-gradient-to-r from-purple-400 to-pink-400 hover:from-purple-500 hover:to-pink-500 text-white shadow-lg shadow-purple-200/40 transition-all duration-300 hover:shadow-xl hover:shadow-purple-300/40 hover:-translate-y-0.5"
+              >
+                {mutation.isPending ? (
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                ) : (
+                  <Sparkles className="mr-2 h-5 w-5" />
+                )}
+                Generate Passphrases
+              </Button>
             </div>
           </CardContent>
         </Card>
 
         {/* Results Section */}
         {passphrases.length > 0 && (
-          <Card className="shadow-lg border-0 bg-white/70 backdrop-blur-sm">
-            <CardContent className="p-6">
-              <h2 className="text-xl font-semibold mb-4 text-gray-800">
-                Generated Passphrases
-              </h2>
-              <div className="space-y-3">
-                {editedPassphrases.map((passphrase, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center p-3 bg-slate-50 rounded-lg"
+          <div className="space-y-3">
+            <h2 className="text-sm font-medium text-purple-900/50 uppercase tracking-wider px-1">
+              Your passphrases
+            </h2>
+            {editedPassphrases.map((passphrase, index) => (
+              <div
+                key={index}
+                className="passphrase-row flex items-center p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-purple-100/40 shadow-sm"
+              >
+                {editingIndex === index ? (
+                  <Input
+                    defaultValue={passphrase}
+                    onBlur={(e) => handleEditFinish(e.target.value, index)}
+                    onKeyPress={(e) =>
+                      handleEditKeyPress(e, index, e.currentTarget.value)
+                    }
+                    autoFocus
+                    className="flex-grow bg-white/80 rounded-lg border-purple-200"
+                  />
+                ) : (
+                  <p className="flex-grow text-purple-900/80 font-mono text-base sm:text-lg break-all leading-relaxed">
+                    {passphrase}
+                  </p>
+                )}
+                <div className="flex items-center ml-3 gap-1">
+                  <button
+                    onClick={() => handleEditStart(index)}
+                    className="p-2 rounded-lg text-purple-300 hover:text-purple-500 hover:bg-purple-50 transition-colors"
+                    aria-label="Edit passphrase"
                   >
-                    {editingIndex === index ? (
-                      <Input
-                        defaultValue={passphrase}
-                        onBlur={(e) => handleEditFinish(e.target.value, index)}
-                        onKeyPress={(e) =>
-                          handleEditKeyPress(e, index, e.currentTarget.value)
-                        }
-                        autoFocus
-                        className="flex-grow bg-white"
-                      />
+                    <Edit2 className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => copyToClipboard(passphrase, index)}
+                    className="p-2 rounded-lg text-purple-300 hover:text-purple-500 hover:bg-purple-50 transition-colors"
+                    aria-label="Copy passphrase"
+                  >
+                    {copiedIndex === index ? (
+                      <Check className="h-4 w-4 text-emerald-400" />
                     ) : (
-                      <p className="flex-grow text-gray-800 font-mono text-lg break-all">
-                        {passphrase}
-                      </p>
+                      <Copy className="h-4 w-4" />
                     )}
-                    <div className="flex items-center ml-4 space-x-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleEditStart(index)}
-                        className="text-gray-500 hover:text-purple-600"
-                        aria-label="Edit passphrase"
-                      >
-                        <Edit2 className="h-5 w-5" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => copyToClipboard(passphrase, index)}
-                        className="text-gray-500 hover:text-purple-600"
-                        aria-label="Copy passphrase"
-                      >
-                        {copiedIndex === index ? (
-                          <Check className="h-5 w-5 text-green-500" />
-                        ) : (
-                          <Copy className="h-5 w-5" />
-                        )}
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+                  </button>
+                </div>
               </div>
-            </CardContent>
-          </Card>
+            ))}
+          </div>
         )}
 
         {/* Empty State */}
         {passphrases.length === 0 && !mutation.isPending && (
-          <Card className="border-dashed border-2 border-gray-300 bg-white/50">
-            <CardContent className="p-12 text-center">
-              <div className="text-gray-500">
-                <p className="text-lg mb-2">
-                  No music passphrases generated yet
-                </p>
-                <p className="text-sm">
-                  Enter a music artist name above and click "Generate Music
-                  Passphrases"
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="text-center py-16">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-purple-50 mb-4">
+              <Sparkles className="h-5 w-5 text-purple-300" />
+            </div>
+            <p className="text-purple-900/40 text-base">
+              Enter an artist and generate your first passphrase
+            </p>
+          </div>
         )}
 
-        {/* Footer with Build Info */}
-        <footer className="mt-8 text-center text-gray-500 text-sm">
+        {/* Footer */}
+        <footer className="mt-12 text-center text-purple-900/30 text-xs">
           <DevelopmentBuildInfo />
           <BuildInfo />
-          <p>
-            Made with <span className="text-red-500">&hearts;</span> by Music
-            Passphrase
+          <p className="mt-1">
+            Made with <span className="text-pink-300">&hearts;</span> by Music Passphrase
           </p>
         </footer>
       </div>

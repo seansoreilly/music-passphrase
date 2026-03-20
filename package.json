@@ -65,6 +65,8 @@
     "@vercel/analytics": "^1.5.0",
     "@vercel/node": "^5.2.0",
     "@vercel/speed-insights": "^1.2.0",
+    "baseline-browser-mapping": "^2.10.9",
+    "caniuse-lite": "^1.0.30001780",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
