@@ -65,10 +65,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           content: prompt,
         },
       ],
-      model: 'llama-3.1-8b-instant', // Larger model for better factual accuracy
+      model: 'openai/gpt-oss-120b', // Larger model for better factual accuracy
       temperature: 0.1, // Very low for maximum accuracy
-      max_tokens: 200,
+      max_tokens: 1000, // Reasoning tokens count toward this limit
       top_p: 0.9,
+      reasoning_effort: 'low',
       stream: false,
     });
 
