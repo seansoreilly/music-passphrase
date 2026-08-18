@@ -5,11 +5,60 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Loader2, Copy, Check, Edit2, Music, Sparkles, Hash, AtSign, Space } from "lucide-react";
+import { Loader2, Copy, Check, Edit2, Music, Sparkles, Hash, AtSign, Space, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { generatePassphrases } from "@/api/generate";
 import { BuildInfo, DevelopmentBuildInfo } from "@/components/BuildInfo";
 import { track } from "@/lib/analytics";
+import { estimatePassphraseStrength, type StrengthTier } from "@/lib/strength";
+
+const STRENGTH_SEGMENT_COLORS: Record<StrengthTier, string> = {
+  weak: "bg-red-300",
+  fair: "bg-amber-300",
+  good: "bg-lime-300",
+  strong: "bg-emerald-300",
+};
+
+const STRENGTH_TEXT_COLORS: Record<StrengthTier, string> = {
+  weak: "text-red-400/80",
+  fair: "text-amber-500/80",
+  good: "text-lime-600/80",
+  strong: "text-emerald-500/80",
+};
+
+const STRENGTH_TIER_LEVEL: Record<StrengthTier, number> = {
+  weak: 1,
+  fair: 2,
+  good: 3,
+  strong: 4,
+};
+
+const StrengthMeter = ({ passphrase }: { passphrase: string }) => {
+  const { bits, tier, label } = estimatePassphraseStrength(passphrase);
+  const activeSegments = STRENGTH_TIER_LEVEL[tier];
+
+  return (
+    <div
+      className="flex items-center gap-2 mt-1.5"
+      title={`Estimated ~${bits} bits of entropy. This is a heuristic estimate, not a guarantee.`}
+    >
+      <div className="flex gap-1">
+        {[1, 2, 3, 4].map((segment) => (
+          <span
+            key={segment}
+            className={`h-1.5 w-5 rounded-full transition-colors ${
+              segment <= activeSegments ? STRENGTH_SEGMENT_COLORS[tier] : "bg-purple-100"
+            }`}
+          />
+        ))}
+      </div>
+      <span className={`text-xs font-medium ${STRENGTH_TEXT_COLORS[tier]}`}>
+        {label}
+      </span>
+      <span className="text-xs text-purple-900/30">~{bits} bits</span>
+    </div>
+  );
+};
 
 const Index = () => {
   const [keywords, setKeywords] = useState("");
@@ -22,6 +71,7 @@ const Index = () => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [regeneratingIndex, setRegeneratingIndex] = useState<number | null>(null);
   const { toast } = useToast();
 
   const mutation = useMutation({
@@ -193,6 +243,61 @@ const Index = () => {
     }
   };
 
+  const handleRegenerate = async (index: number) => {
+    if (!keywords.trim() || mutation.isPending || regeneratingIndex !== null) {
+      return;
+    }
+
+    setRegeneratingIndex(index);
+    track("regenerate_passphrase", { passphrase_index: index });
+
+    try {
+      const newPassphrases = await generatePassphrases({
+        keywords: keywords.trim(),
+        addNumber,
+        addSpecialChar,
+        includeSpaces,
+        length,
+      });
+
+      const replacement =
+        newPassphrases.find((candidate) => !editedPassphrases.includes(candidate)) ??
+        newPassphrases[0];
+
+      if (!replacement) {
+        throw new Error("No passphrase returned");
+      }
+
+      setPassphrases((prev) => {
+        const next = [...prev];
+        next[index] = replacement;
+        return next;
+      });
+      setEditedPassphrases((prev) => {
+        const next = [...prev];
+        next[index] = replacement;
+        return next;
+      });
+
+      toast({
+        title: "Regenerated!",
+        description: "Passphrase has been replaced",
+      });
+    } catch (error) {
+      console.error("Error regenerating passphrase:", error);
+      toast({
+        title: "Error",
+        description: "Failed to regenerate passphrase. Please try again.",
+        variant: "destructive",
+      });
+      track("api_error", {
+        error_message: error instanceof Error ? error.message : "Unknown error",
+      });
+    } finally {
+      setRegeneratingIndex(null);
+    }
+  };
+
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Pastel background blobs */}
@@ -344,24 +449,37 @@ const Index = () => {
             {editedPassphrases.map((passphrase, index) => (
               <div
                 key={index}
-                className="passphrase-row flex items-center p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-purple-100/40 shadow-sm"
+                className="passphrase-row flex items-start p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-purple-100/40 shadow-sm"
               >
-                {editingIndex === index ? (
-                  <Input
-                    defaultValue={passphrase}
-                    onBlur={(e) => handleEditFinish(e.target.value, index)}
-                    onKeyPress={(e) =>
-                      handleEditKeyPress(e, index, e.currentTarget.value)
-                    }
-                    autoFocus
-                    className="flex-grow bg-white/80 rounded-lg border-purple-200"
-                  />
-                ) : (
-                  <p className="flex-grow text-purple-900/80 font-mono text-base sm:text-lg break-all leading-relaxed">
-                    {passphrase}
-                  </p>
-                )}
-                <div className="flex items-center ml-3 gap-1">
+                <div className="flex-grow min-w-0">
+                  {editingIndex === index ? (
+                    <Input
+                      defaultValue={passphrase}
+                      onBlur={(e) => handleEditFinish(e.target.value, index)}
+                      onKeyPress={(e) =>
+                        handleEditKeyPress(e, index, e.currentTarget.value)
+                      }
+                      autoFocus
+                      className="bg-white/80 rounded-lg border-purple-200"
+                    />
+                  ) : (
+                    <p className="text-purple-900/80 font-mono text-base sm:text-lg break-all leading-relaxed">
+                      {passphrase}
+                    </p>
+                  )}
+                  <StrengthMeter passphrase={passphrase} />
+                </div>
+                <div className="flex items-center ml-3 gap-1 pt-0.5">
+                  <button
+                    onClick={() => handleRegenerate(index)}
+                    disabled={mutation.isPending || regeneratingIndex !== null}
+                    className="p-2 rounded-lg text-purple-300 hover:text-purple-500 hover:bg-purple-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    aria-label="Regenerate passphrase"
+                  >
+                    <RefreshCw
+                      className={`h-4 w-4 ${regeneratingIndex === index ? "animate-spin" : ""}`}
+                    />
+                  </button>
                   <button
                     onClick={() => handleEditStart(index)}
                     className="p-2 rounded-lg text-purple-300 hover:text-purple-500 hover:bg-purple-50 transition-colors"
