@@ -69,7 +69,6 @@ const Index = () => {
   const [passphrases, setPassphrases] = useState<string[]>([]);
   const [editedPassphrases, setEditedPassphrases] = useState<string[]>([]);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [loading, setLoading] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [regeneratingIndex, setRegeneratingIndex] = useState<number | null>(null);
   const { toast } = useToast();
