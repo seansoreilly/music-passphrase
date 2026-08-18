@@ -13,15 +13,29 @@ interface ApiResponse {
   details?: string;
 }
 
+// Cryptographically strong random integer in [min, max) using the Web Crypto
+// API available in all modern browsers (no extra dependency required).
+function secureRandomInt(min: number, max: number): number {
+  const range = max - min;
+  const maxUint32 = 0xffffffff;
+  const rejectionThreshold = maxUint32 - (maxUint32 % range);
+
+  let randomValue: number;
+  do {
+    const buffer = new Uint32Array(1);
+    globalThis.crypto.getRandomValues(buffer);
+    randomValue = buffer[0];
+  } while (randomValue >= rejectionThreshold);
+
+  return min + (randomValue % range);
+}
+
 export async function generatePassphrases(requestBody: RequestBody): Promise<string[]> {
   const { keywords, addNumber, addSpecialChar, includeSpaces, length } = requestBody;
 
   if (!keywords || keywords.trim().length === 0) {
     throw new Error('Keywords are required');
   }
-
-  console.log('Generating passphrases for keywords:', keywords);
-  console.log('Options:', { addNumber, addSpecialChar, includeSpaces, length });
 
   try {
     const response = await fetch('/api/generate-passphrases', {
@@ -93,12 +107,12 @@ function generateMockPassphrases(keywords: string, addNumber: boolean, addSpecia
     // Build suffix first so we can reserve space
     let suffix = '';
     if (addNumber) {
-      const randomNumber = Math.floor(Math.random() * 90) + 10;
+      const randomNumber = secureRandomInt(10, 100); // 10-99
       suffix += includeSpaces ? ` ${randomNumber}` : `${randomNumber}`;
     }
     if (addSpecialChar) {
       const specialChars = ['!', '@', '#', '$', '%', '&', '*', '?'];
-      suffix += specialChars[Math.floor(Math.random() * specialChars.length)];
+      suffix += specialChars[secureRandomInt(0, specialChars.length)];
     }
 
     // Truncate base text to fit within length including suffix
