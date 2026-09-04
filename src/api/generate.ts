@@ -13,15 +13,19 @@ interface ApiResponse {
   details?: string;
 }
 
-export async function generatePassphrases(requestBody: RequestBody): Promise<string[]> {
+export interface GeneratePassphrasesResult {
+  passphrases: string[];
+  source: "api" | "mock";
+}
+
+export async function generatePassphrases(
+  requestBody: RequestBody
+): Promise<GeneratePassphrasesResult> {
   const { keywords, addNumber, addSpecialChar, includeSpaces, length } = requestBody;
 
   if (!keywords || keywords.trim().length === 0) {
     throw new Error('Keywords are required');
   }
-
-  console.log('Generating passphrases for keywords:', keywords);
-  console.log('Options:', { addNumber, addSpecialChar, includeSpaces, length });
 
   try {
     const response = await fetch('/api/generate-passphrases', {
@@ -39,24 +43,22 @@ export async function generatePassphrases(requestBody: RequestBody): Promise<str
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+      const errorData: Partial<ApiResponse> = await response.json().catch(() => ({}));
       throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
     }
 
     const data: ApiResponse = await response.json();
-    
+
     if (!data.success || !data.passphrases) {
       throw new Error(data.error || 'Failed to generate passphrases');
     }
 
-    return data.passphrases;
+    return { passphrases: data.passphrases, source: "api" };
   } catch (error) {
-    console.error('API Error:', error);
-    
-    // If there's an issue with the API, fall back to mock implementation
-    console.log('Falling back to mock implementation...');
+    console.error('API Error, falling back to mock implementation:', error);
+
     const mockPassphrases = generateMockPassphrases(keywords, addNumber, addSpecialChar, includeSpaces, length);
-    return mockPassphrases;
+    return { passphrases: mockPassphrases, source: "mock" };
   }
 }
 
