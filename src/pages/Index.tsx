@@ -182,6 +182,17 @@ const Index = () => {
     });
   };
 
+  // Blur commits a non-empty edit and otherwise reverts; unlike Enter it must
+  // always leave edit mode, so an empty value never strands an open input.
+  const handleEditBlur = (value: string, index: number) => {
+    if (value.trim() !== "") {
+      const newEditedPassphrases = [...editedPassphrases];
+      newEditedPassphrases[index] = value.trim();
+      setEditedPassphrases(newEditedPassphrases);
+    }
+    setEditingIndex(null);
+  };
+
   const handleEditKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>,
     index: number
@@ -332,7 +343,7 @@ const Index = () => {
                   {editingIndex === index ? (
                     <Input
                       defaultValue={passphrase}
-                      onBlur={(e) => handleEditSave(e.target.value, index)}
+                      onBlur={(e) => handleEditBlur(e.target.value, index)}
                       onKeyDown={(e) => handleEditKeyDown(e, index)}
                       autoFocus
                       aria-label={`Edit passphrase ${index + 1}`}
