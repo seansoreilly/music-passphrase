@@ -1,5 +1,5 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { formatPassphrase, requestPhrases } from './_lib/passphrase.js';
+import { formatPassphrase, requestPhrases, targetPhraseLength } from './_lib/passphrase.js';
 
 const MAX_PASSPHRASE_LENGTH = Number(process.env.MAX_PASSPHRASE_LENGTH) || 40;
 
@@ -43,11 +43,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(500).json({ error: 'OpenRouter API key not configured' });
     }
 
-    const { phrases, model } = await requestPhrases(keywords.trim(), charCount, { apiKey });
+    const formatOptions = { addNumber, addSpecialChar, includeSpaces, charCount };
+    const { phrases, model } = await requestPhrases(keywords.trim(), targetPhraseLength(formatOptions), { apiKey });
 
-    const processedPassphrases = phrases.map(phrase =>
-      formatPassphrase(phrase, { addNumber, addSpecialChar, includeSpaces, charCount })
-    );
+    const processedPassphrases = phrases.map(phrase => formatPassphrase(phrase, formatOptions));
 
     console.log(`Processed passphrases (${model}):`, processedPassphrases);
 

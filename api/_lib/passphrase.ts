@@ -11,18 +11,35 @@ const REQUEST_TIMEOUT_MS = 12000;
 const MAX_PHRASE_LENGTH = 80;
 
 export function buildPrompt(artist: string, charCount: number): string {
-  return `Generate 5 unique short phrases (approximately ${charCount} characters each, including spaces) from the artist "${artist}".
+  const minChars = Math.max(charCount - 4, 1);
+  return `Generate 5 unique passphrases built from song titles by the artist "${artist}".
+
+    LENGTH: Each passphrase must be between ${minChars} and ${charCount} characters long, counting letters and spaces. Aim for ${charCount}. Never exceed ${charCount}.
+    - If one song title is too short, join titles (or runs of consecutive words from titles) from two or more different songs, separated by single spaces, until the length is reached.
+    - If a title is too long, use a run of consecutive words from it.
+    - Example: for 27 characters, "Enter Sandman Fade to Black" joins two titles (13 + 1 + 13 = 27).
+    - Count the characters of each passphrase before answering and fix any that are outside ${minChars}-${charCount}.
 
     Requirements:
     - Use ACTUAL CONSECUTIVE WORDS from published song titles
     - Do NOT invent or modify titles
-    - Do NOT change the order of words
+    - Do NOT change the order of words within a title
     - Do NOT provide duplicates
-    - Each phrase must be exactly as it appears in the original public song titles
+    - No punctuation other than what appears in the titles
 
-    RESPONSE FORMAT: Return ONLY the phrases, one per line, with NO explanatory text, NO introductions, NO headers.
+    RESPONSE FORMAT: Return ONLY the passphrases, one per line, with NO explanatory text, NO character counts, NO introductions, NO headers.
 
-    If you're not certain about exact lyrics, don't guess.`;
+    If you're not certain a title exists, don't use it.`;
+}
+
+// Length the model should aim for: what's left after the number/symbol suffix,
+// scaled up when spaces will be stripped so the final string still lands near charCount.
+export function targetPhraseLength(opts: FormatOptions): number {
+  let suffixLength = 0;
+  if (opts.addNumber) suffixLength += opts.includeSpaces ? 3 : 2;
+  if (opts.addSpecialChar) suffixLength += 1;
+  const base = Math.max(opts.charCount - suffixLength, 3);
+  return opts.includeSpaces ? base : Math.round(base * 1.15);
 }
 
 const REFUSAL_PATTERNS = [
@@ -76,7 +93,10 @@ export function formatPassphrase(phrase: string, opts: FormatOptions, random: ()
   // Truncate base text to fit within charCount including suffix
   const maxBase = opts.charCount - suffix.length;
   if (processed.length > maxBase) {
-    processed = processed.slice(0, maxBase).replace(/\s+$/, '');
+    const cut = processed.slice(0, maxBase);
+    // Prefer ending on a whole word when that keeps most of the length.
+    const lastSpace = processed[maxBase] === ' ' ? maxBase : cut.lastIndexOf(' ');
+    processed = (lastSpace >= maxBase * 0.75 ? cut.slice(0, lastSpace) : cut).replace(/\s+$/, '');
   }
 
   return processed + suffix;
