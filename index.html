@@ -3,58 +3,61 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Music Passphrase - AI-Powered Music Artist Passphrases</title>
-    <meta name="description" content="Generate ultra-secure passwords using your favorite music artists. Our AI-powered passphrase generator creates memorable yet unbreakable passwords with military-grade security. 100% private, no storage." />
-    <meta name="keywords" content="secure password generator, safe passphrase creator, music password security, AI password safety, unhackable passwords, cybersecurity tool, password protection, memorable secure passwords, passphrase generator, music passphrases, AI password generator, secure passwords, music artists, password creation" />
+    <title>Music Passphrase – Free Passphrase Generator from Your Favorite Artists</title>
+    <meta name="description" content="Free passphrase generator that turns your favorite artists and song titles into secure, memorable passphrases. Add numbers and symbols, pick a length, copy." />
     <meta name="author" content="Music Passphrase" />
-    
-    <!-- Open Graph / Facebook -->
+    <meta name="theme-color" content="#a855f7" />
+    <link rel="canonical" href="https://www.musicpassphrase.com/" />
+
+    <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://musicpassphrase.com/" />
-    <meta property="og:title" content="Music Passphrase - AI-Powered Music Artist Passphrases" />
-    <meta property="og:description" content="Generate ultra-secure passwords using your favorite music artists. Our AI-powered passphrase generator creates memorable yet unbreakable passwords with military-grade security. 100% private, no storage." />
-    <meta property="og:image" content="https://musicpassphrase.com/og-image.jpg" />
+    <meta property="og:site_name" content="Music Passphrase" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://www.musicpassphrase.com/" />
+    <meta property="og:title" content="Music Passphrase – Free Passphrase Generator from Your Favorite Artists" />
+    <meta property="og:description" content="Turn your favorite artists and song titles into secure, memorable passphrases. Free, no sign-up." />
+    <meta property="og:image" content="https://www.musicpassphrase.com/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Music Passphrase – free passphrase generator built from your favorite artists" />
 
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://musicpassphrase.com/" />
-    <meta property="twitter:title" content="Music Passphrase - AI-Powered Music Artist Passphrases" />
-    <meta property="twitter:description" content="Generate ultra-secure passwords using your favorite music artists. Our AI-powered passphrase generator creates memorable yet unbreakable passwords with military-grade security. 100% private, no storage." />
-    <meta property="twitter:image" content="https://musicpassphrase.com/og-image.jpg" />
-    
-    <!-- Additional SEO -->
-    <meta name="robots" content="index, follow" />
-    <meta name="language" content="English" />
-    <link rel="canonical" href="https://musicpassphrase.com/" />
-    <link rel="icon" href="favicon/favicon.ico" type="image/x-icon" />
-    
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Music Passphrase – Free Passphrase Generator from Your Favorite Artists" />
+    <meta name="twitter:description" content="Turn your favorite artists and song titles into secure, memorable passphrases. Free, no sign-up." />
+    <meta name="twitter:image" content="https://www.musicpassphrase.com/og-image.png" />
+
+    <link rel="icon" href="/favicon/favicon.ico" sizes="any" />
+    <link rel="icon" href="/favicon/favicon-192x192.png" type="image/png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="/favicon/favicon-192x192.png" />
+
     <!-- Schema Markup -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "Music Passphrase Generator",
+      "@type": "WebApplication",
+      "name": "Music Passphrase",
+      "url": "https://www.musicpassphrase.com/",
+      "description": "Free passphrase generator that turns your favorite artists and song titles into secure, memorable passphrases.",
       "applicationCategory": "SecurityApplication",
-      "operatingSystem": "Web",
+      "operatingSystem": "Any",
+      "browserRequirements": "Requires JavaScript",
+      "isAccessibleForFree": true,
+      "image": "https://www.musicpassphrase.com/og-image.png",
       "offers": {
         "@type": "Offer",
         "price": "0",
         "priceCurrency": "USD"
       },
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "reviewCount": "1523"
-      },
       "featureList": [
-        "AI-powered generation",
-        "No password storage",
-        "Customizable security options",
-        "Music artist integration"
+        "Passphrases built from song titles by the artist you choose",
+        "Optional numbers, symbols and spaces",
+        "Adjustable target length",
+        "Saved passphrases stay in your browser only"
       ]
     }
     </script>
-    
+
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-KS7KLK8277"></script>
     <script>
@@ -66,9 +69,14 @@
   </head>
 
   <body>
-    <div id="root"></div>
-    <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
-    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
+    <div id="root">
+      <!-- Static fallback for crawlers and no-JS visitors; React replaces it on load. -->
+      <main style="max-width:42rem;margin:0 auto;padding:3rem 1rem;font-family:system-ui,sans-serif;color:#3b0764">
+        <h1>Music Passphrase – free passphrase generator</h1>
+        <p>Turn your favorite artists into secure, memorable passphrases. Enter an artist, and Music Passphrase builds passphrases from their song titles, with optional numbers, symbols and spaces.</p>
+        <noscript><p>Music Passphrase needs JavaScript to generate passphrases.</p></noscript>
+      </main>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
