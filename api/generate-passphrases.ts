@@ -1,6 +1,8 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { formatPassphrase, requestPhrases } from './_lib/passphrase.js';
 
+const MAX_PASSPHRASE_LENGTH = Number(process.env.MAX_PASSPHRASE_LENGTH) || 40;
+
 interface RequestBody {
   keywords: string;
   addNumber: boolean;
@@ -30,7 +32,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const { keywords, addNumber, addSpecialChar, includeSpaces, length }: RequestBody = req.body;
-    const charCount = Math.min(Math.max(length || 10, 5), 20);
+    const charCount = Math.min(Math.max(length || 10, 5), MAX_PASSPHRASE_LENGTH);
 
     if (!keywords || keywords.trim().length === 0) {
       return res.status(400).json({ error: 'Keywords are required' });
