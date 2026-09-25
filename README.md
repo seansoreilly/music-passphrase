@@ -95,6 +95,10 @@ VITE_GROQ_API_KEY=your_groq_api_key_here
 
 # Optional: Analytics
 VERCEL_ANALYTICS_ID=your_vercel_analytics_id
+
+# Optional: Maximum passphrase length (defaults to 40)
+MAX_PASSPHRASE_LENGTH=40
+VITE_MAX_PASSPHRASE_LENGTH=40
 ```
 
 **For Vercel Deployment:**
