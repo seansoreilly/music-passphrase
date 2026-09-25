@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { formatPassphrase, isRefusal, parsePhrases, requestPhrases } from './passphrase.ts';
+import { buildPrompt, formatPassphrase, isRefusal, parsePhrases, requestPhrases, targetPhraseLength } from './passphrase.ts';
 
 test('parsePhrases splits lines, strips numbering/bullets/quotes, dedupes, caps at 5', () => {
   const content = '1. "Enter Sandman"\n- Fade to Black\n\n* Fade to Black\n2) Don’t Tread on Me\nSad but True\nMaster of Puppets\nBattery';
@@ -28,6 +28,28 @@ test('formatPassphrase capitalises, applies suffix and length cap', () => {
   const long = formatPassphrase('Four Seasons In One Day', { ...opts, charCount: 12 }, () => 0);
   assert.ok(long.length <= 12, long);
   assert.equal(formatPassphrase('Money Trees', { ...opts, addNumber: false, addSpecialChar: false, includeSpaces: false }, () => 0), 'Moneytrees');
+});
+
+test('formatPassphrase truncates on a word boundary when it keeps most of the length', () => {
+  const opts = { addNumber: false, addSpecialChar: false, includeSpaces: true, charCount: 30 };
+  assert.equal(formatPassphrase('Before too long how to make gravy', opts), 'Before too long how to make');
+  // Next char is a space: exact fit, no back-off
+  assert.equal(formatPassphrase('Enter sandman fade to black one', { ...opts, charCount: 27 }), 'Enter sandman fade to black');
+  // Backing off would lose too much, so hard-cut instead
+  assert.equal(formatPassphrase('Supercalifragilisticexpialidocious', { ...opts, charCount: 10 }), 'Supercalif');
+});
+
+test('buildPrompt asks for the target length and allows joining titles', () => {
+  const p = buildPrompt('Metallica', 40);
+  assert.match(p, /between 36 and 40 characters/);
+  assert.match(p, /two or more different songs/);
+});
+
+test('targetPhraseLength reserves room for the suffix and stripped spaces', () => {
+  const base = { addNumber: false, addSpecialChar: false, includeSpaces: true, charCount: 40 };
+  assert.equal(targetPhraseLength(base), 40);
+  assert.equal(targetPhraseLength({ ...base, addNumber: true, addSpecialChar: true }), 36);
+  assert.equal(targetPhraseLength({ ...base, addNumber: true, includeSpaces: false }), 44);
 });
 
 function fakeFetch(responses: Array<{ status?: number; body: unknown } | Error>) {
