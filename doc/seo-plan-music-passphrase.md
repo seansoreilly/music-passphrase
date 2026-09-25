@@ -98,6 +98,8 @@ Create a dedicated "/security" page highlighting:
 ## 4. Technical SEO Improvements
 
 ### Schema Markup Implementation
+> Do not add `aggregateRating` unless it is backed by real, on-page user reviews — fabricated ratings violate Google's structured data policies and risk a manual action.
+
 ```json
 {
   "@context": "https://schema.org",
@@ -109,11 +111,6 @@ Create a dedicated "/security" page highlighting:
     "@type": "Offer",
     "price": "0",
     "priceCurrency": "USD"
-  },
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.8",
-    "reviewCount": "1523"
   },
   "featureList": [
     "AI-powered generation",
