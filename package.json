@@ -26,6 +26,7 @@
     "build:production": "npm run lint && vite build --mode production",
     "build:vercel": "vite build --mode production",
     "lint": "eslint .",
+    "test": "node --test api/_lib/*.test.ts",
     "preview": "vite preview",
     "health": "node -e \"import('./dist/api/health.js').then(h => h.getHealthStatus().then(console.log))\"",
     "version": "node -e \"console.log(require('./package.json').version)\""
