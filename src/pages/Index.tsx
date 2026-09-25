@@ -292,7 +292,7 @@ const Index = () => {
                   id="length"
                   type="range"
                   min={5}
-                  max={20}
+                  max={40}
                   value={length}
                   onChange={(e) => setLength(Number(e.target.value))}
                   disabled={mutation.isPending}
@@ -301,7 +301,7 @@ const Index = () => {
                 />
                 <div className="flex justify-between text-xs text-purple-300">
                   <span>5</span>
-                  <span>20</span>
+                  <span>40</span>
                 </div>
               </div>
 

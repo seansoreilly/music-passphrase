@@ -34,7 +34,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const { keywords, addNumber, addSpecialChar, includeSpaces, length }: RequestBody = req.body;
-    const charCount = Math.min(Math.max(length || 10, 5), 20);
+    const charCount = Math.min(Math.max(length || 10, 5), 40);
 
     if (!keywords || keywords.trim().length === 0) {
       return res.status(400).json({ error: 'Keywords are required' });
