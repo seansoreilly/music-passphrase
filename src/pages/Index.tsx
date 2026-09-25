@@ -18,6 +18,8 @@ interface OptionPillConfig {
   activeClass: string;
 }
 
+const MAX_PASSPHRASE_LENGTH = Number(import.meta.env.VITE_MAX_PASSPHRASE_LENGTH) || 40;
+
 const OPTION_PILLS: OptionPillConfig[] = [
   {
     key: "addNumber",
@@ -292,7 +294,7 @@ const Index = () => {
                   id="length"
                   type="range"
                   min={5}
-                  max={20}
+                  max={MAX_PASSPHRASE_LENGTH}
                   value={length}
                   onChange={(e) => setLength(Number(e.target.value))}
                   disabled={mutation.isPending}
@@ -301,7 +303,7 @@ const Index = () => {
                 />
                 <div className="flex justify-between text-xs text-purple-300">
                   <span>5</span>
-                  <span>20</span>
+                  <span>{MAX_PASSPHRASE_LENGTH}</span>
                 </div>
               </div>
 
