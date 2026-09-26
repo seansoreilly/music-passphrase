@@ -13,4 +13,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://musicpassphrase.com/sitemap.xml
+Sitemap: https://www.musicpassphrase.com/sitemap.xml
