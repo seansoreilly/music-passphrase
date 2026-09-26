@@ -144,4 +144,6 @@ dev-debug.log
 # OS specific
 # Task files
 tasks.json
-tasks/ 
+tasks/
+# Windows download metadata (WSL)
+*:Zone.Identifier
