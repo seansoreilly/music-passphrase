@@ -9,8 +9,8 @@ declare const __NODE_ENV__: string;
 // Google Analytics gtag function declaration
 declare global {
   interface Window {
-    gtag: (...args: any[]) => void;
-    dataLayer: any[];
+    gtag: (...args: unknown[]) => void;
+    dataLayer: unknown[];
   }
 }
 
