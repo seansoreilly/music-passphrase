@@ -223,7 +223,7 @@ const Index = () => {
             Music Passphrase
           </h1>
           <p className="text-muted-foreground text-lg font-light max-w-md mx-auto">
-            Turn your favorite artists into secure, memorable passphrases
+            A free passphrase generator that turns your favorite artists into secure, memorable passphrases
           </p>
         </div>
 
@@ -405,6 +405,58 @@ const Index = () => {
             </p>
           </div>
         )}
+
+        {/* About content: gives search engines and first-time visitors real text to read */}
+        <section aria-labelledby="how-it-works" className="mt-12 space-y-4 text-purple-900/70">
+          <h2 id="how-it-works" className="font-display text-2xl font-semibold text-purple-900/80">
+            How the music passphrase generator works
+          </h2>
+          <ol className="list-decimal pl-5 space-y-2">
+            <li>Type an artist or band you love, such as Taylor Swift or The Beatles.</li>
+            <li>Choose whether to add numbers, symbols and spaces, and set a target length.</li>
+            <li>Generate a set of passphrases built from that artist's song titles, then edit or copy the one you like.</li>
+          </ol>
+        </section>
+
+        <section aria-labelledby="why-passphrases" className="mt-10 space-y-3 text-purple-900/70">
+          <h2 id="why-passphrases" className="font-display text-2xl font-semibold text-purple-900/80">
+            Why song-title passphrases are easy to remember
+          </h2>
+          <p>
+            A passphrase strings several words together instead of cramming symbols into a short password.
+            Length is what makes a password hard to guess, and a phrase you already know by heart is far
+            easier to recall than a random string. Adding a number and a symbol makes it harder still and
+            satisfies sites that require them.
+          </p>
+          <p>
+            For your most important accounts, use a different passphrase for every site and keep them in a
+            password manager.
+          </p>
+        </section>
+
+        <section aria-labelledby="faq" className="mt-10 space-y-4 text-purple-900/70">
+          <h2 id="faq" className="font-display text-2xl font-semibold text-purple-900/80">
+            Frequently asked questions
+          </h2>
+          <div>
+            <h3 className="font-medium text-purple-900/80">Is Music Passphrase free?</h3>
+            <p>Yes. It's free to use and there's no sign-up.</p>
+          </div>
+          <div>
+            <h3 className="font-medium text-purple-900/80">Do you store my passphrases?</h3>
+            <p>
+              No. Generated passphrases are shown in your browser and are not saved on our servers. Your
+              chosen artist and options are remembered in your browser's local storage so they're there next time.
+            </p>
+          </div>
+          <div>
+            <h3 className="font-medium text-purple-900/80">What gets sent to the server?</h3>
+            <p>
+              Only the artist name and your options. They're sent to an AI model to find song titles, which
+              are then formatted into passphrases.
+            </p>
+          </div>
+        </section>
 
         {/* Footer */}
         <footer className="mt-12 text-center text-purple-900/30 text-xs">

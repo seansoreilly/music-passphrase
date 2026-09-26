@@ -48,7 +48,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const processedPassphrases = phrases.map(phrase => formatPassphrase(phrase, formatOptions));
 
-    console.log(`Processed passphrases (${model}):`, processedPassphrases);
+    console.log(`Generated ${processedPassphrases.length} passphrases (${model})`);
 
     return res.status(200).json({
       passphrases: processedPassphrases,
