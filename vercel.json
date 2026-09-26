@@ -1,17 +1,4 @@
 {
     "buildCommand": "npm run build",
-    "cleanUrls": true,
-    "redirects": [
-        {
-            "source": "/:path*",
-            "has": [
-                {
-                    "type": "host",
-                    "value": "phrase-forge-groq-gen.vercel.app"
-                }
-            ],
-            "destination": "https://www.musicpassphrase.com/:path*",
-            "permanent": true
-        }
-    ]
+    "cleanUrls": true
 }
