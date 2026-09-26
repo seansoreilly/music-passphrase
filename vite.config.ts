@@ -36,7 +36,7 @@ function getBuildInfo() {
       console.log("Using local git commit hash:", hash);
       return hash;
     } catch (error) {
-      console.warn("Could not get git commit hash:", error.message);
+      console.warn("Could not get git commit hash:", error instanceof Error ? error.message : error);
       return "unknown";
     }
   }
