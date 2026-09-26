@@ -2,13 +2,21 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Analytics } from "@vercel/analytics/react";
-import { SpeedInsights } from "@vercel/speed-insights/react";
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
 import { trackPageView, initAnalytics } from "./lib/analytics";
+
+// Not on the critical path for the "/" route: split them into their own
+// chunks so the initial bundle only has to parse/execute what the landing
+// page actually needs.
+const NotFound = lazy(() => import("./pages/NotFound"));
+const Analytics = lazy(() =>
+  import("@vercel/analytics/react").then((m) => ({ default: m.Analytics }))
+);
+const SpeedInsights = lazy(() =>
+  import("@vercel/speed-insights/react").then((m) => ({ default: m.SpeedInsights }))
+);
 
 const queryClient = new QueryClient();
 
@@ -45,11 +53,20 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
+          <Route
+            path="*"
+            element={
+              <Suspense fallback={null}>
+                <NotFound />
+              </Suspense>
+            }
+          />
         </Routes>
       </BrowserRouter>
-      <Analytics />
-      <SpeedInsights />
+      <Suspense fallback={null}>
+        <Analytics />
+        <SpeedInsights />
+      </Suspense>
     </TooltipProvider>
   </QueryClientProvider>
 );
