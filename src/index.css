@@ -1,4 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+/* Fonts are loaded from index.html via <link rel="stylesheet">, preconnected,
+   instead of an @import here — an @import buried inside the bundled CSS isn't
+   discoverable by the browser's preload scanner until the JS bundle that
+   references this file has been fetched and parsed, adding a serial
+   round-trip before the font request even starts. */
 
 @tailwind base;
 @tailwind components;
