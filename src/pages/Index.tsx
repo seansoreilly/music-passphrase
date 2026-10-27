@@ -96,8 +96,8 @@ const Index = () => {
         description: "Failed to generate passphrases. Please try again.",
         variant: "destructive",
       });
-      track("api_error", {
-        error_message: error.message,
+      track("generate_error", {
+        error_type: error instanceof TypeError ? "network" : "server",
       });
     },
   });
@@ -134,6 +134,7 @@ const Index = () => {
       });
       return;
     }
+    track("generate_start", { artist_count: keywords.split(",").length });
     mutation.mutate({
       keywords: keywords.trim(),
       addNumber,
