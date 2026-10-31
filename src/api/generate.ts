@@ -1,3 +1,5 @@
+import { secureRandomInt, secureShuffle } from "./secureRandom";
+
 interface RequestBody {
   keywords: string;
   addNumber: boolean;
@@ -80,9 +82,7 @@ function generateMockPassphrases(keywords: string, addNumber: boolean, addSpecia
   ];
 
   // Select 5 random templates
-  const selectedTemplates = baseTemplates
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 5);
+  const selectedTemplates = secureShuffle(baseTemplates).slice(0, 5);
 
   return selectedTemplates.map(template => {
     let passphrase = template.charAt(0).toUpperCase() + template.slice(1);
@@ -95,12 +95,12 @@ function generateMockPassphrases(keywords: string, addNumber: boolean, addSpecia
     // Build suffix first so we can reserve space
     let suffix = '';
     if (addNumber) {
-      const randomNumber = Math.floor(Math.random() * 90) + 10;
+      const randomNumber = secureRandomInt(90) + 10;
       suffix += includeSpaces ? ` ${randomNumber}` : `${randomNumber}`;
     }
     if (addSpecialChar) {
       const specialChars = ['!', '@', '#', '$', '%', '&', '*', '?'];
-      suffix += specialChars[Math.floor(Math.random() * specialChars.length)];
+      suffix += specialChars[secureRandomInt(specialChars.length)];
     }
 
     // Truncate base text to fit within length including suffix

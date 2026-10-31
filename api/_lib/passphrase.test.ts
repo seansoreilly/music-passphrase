@@ -30,6 +30,27 @@ test('formatPassphrase capitalises, applies suffix and length cap', () => {
   assert.equal(formatPassphrase('Money Trees', { ...opts, addNumber: false, addSpecialChar: false, includeSpaces: false }, () => 0), 'Moneytrees');
 });
 
+test('formatPassphrase asks the injected RNG for [0,90) and [0,8) and maps results', () => {
+  const opts = { addNumber: true, addSpecialChar: true, includeSpaces: false, charCount: 30 };
+  const bounds: number[] = [];
+  const r = formatPassphrase('Money trees', opts, (max) => { bounds.push(max); return max - 1; });
+  assert.deepEqual(bounds, [90, 8]);
+  assert.equal(r, 'Moneytrees99?');
+});
+
+test('formatPassphrase default RNG yields a 10-99 number and a special char', () => {
+  const opts = { addNumber: true, addSpecialChar: true, includeSpaces: false, charCount: 30 };
+  const seen = new Set<string>();
+  for (let i = 0; i < 200; i++) {
+    const r = formatPassphrase('Money trees', opts);
+    const m = /^Moneytrees(\d{2})([!@#$%&*?])$/.exec(r);
+    assert.ok(m, r);
+    assert.ok(Number(m[1]) >= 10 && Number(m[1]) <= 99, r);
+    seen.add(r);
+  }
+  assert.ok(seen.size > 20, 'suffix should vary');
+});
+
 test('formatPassphrase truncates on a word boundary when it keeps most of the length', () => {
   const opts = { addNumber: false, addSpecialChar: false, includeSpaces: true, charCount: 30 };
   assert.equal(formatPassphrase('Before too long how to make gravy', opts), 'Before too long how to make');

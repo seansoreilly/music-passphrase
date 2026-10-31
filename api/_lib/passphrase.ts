@@ -1,3 +1,4 @@
+import { randomInt } from 'node:crypto';
 // Tried in order; first model returning usable phrases wins.
 // Reasoning is disabled: it adds seconds of latency and, on reasoning models,
 // can consume the token budget and leave the content empty.
@@ -72,7 +73,11 @@ export interface FormatOptions {
   charCount: number;
 }
 
-export function formatPassphrase(phrase: string, opts: FormatOptions, random: () => number = Math.random): string {
+// crypto.randomInt is a CSPRNG and unbiased (rejection sampling internally).
+const cryptoRandomInt = (maxExclusive: number): number => randomInt(maxExclusive);
+
+/** `randomInt(n)` must return an integer in [0, n); injectable for tests. */
+export function formatPassphrase(phrase: string, opts: FormatOptions, randomInt: (maxExclusive: number) => number = cryptoRandomInt): string {
   let processed = phrase.trim();
   processed = processed.charAt(0).toUpperCase() + processed.slice(1).toLowerCase();
 
@@ -82,12 +87,12 @@ export function formatPassphrase(phrase: string, opts: FormatOptions, random: ()
 
   let suffix = '';
   if (opts.addNumber) {
-    const randomNumber = Math.floor(random() * 90) + 10; // 10-99
+    const randomNumber = randomInt(90) + 10; // 10-99
     suffix += opts.includeSpaces ? ` ${randomNumber}` : `${randomNumber}`;
   }
   if (opts.addSpecialChar) {
     const specialChars = ['!', '@', '#', '$', '%', '&', '*', '?'];
-    suffix += specialChars[Math.floor(random() * specialChars.length)];
+    suffix += specialChars[randomInt(specialChars.length)];
   }
 
   // Truncate base text to fit within charCount including suffix
