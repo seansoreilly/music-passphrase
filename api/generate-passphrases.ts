@@ -61,7 +61,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (error instanceof Error) {
       return res.status(500).json({
         error: 'Failed to generate passphrases',
-        details: error.message,
         success: false
       });
     }
