@@ -8,6 +8,7 @@ import { Loader2, Copy, Check, Edit2, Music, Sparkles, Hash, AtSign, Space, type
 import { useToast } from "@/hooks/use-toast";
 import { generatePassphrases } from "@/api/generate";
 import { BuildInfo, DevelopmentBuildInfo } from "@/components/BuildInfo";
+import { SiteCredit } from "@/components/SiteCredit";
 import { track } from "@/lib/analytics";
 import { readStoredJSON, readStoredString } from "@/lib/storage";
 
@@ -466,6 +467,7 @@ const Index = () => {
           <p className="mt-1">
             Made with <span className="text-pink-300">&hearts;</span> by Music Passphrase
           </p>
+          <SiteCredit className="mt-1" />
         </footer>
       </div>
     </div>
