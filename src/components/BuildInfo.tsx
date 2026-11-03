@@ -51,16 +51,7 @@ export function DevelopmentBuildInfo() {
     <div className="text-center space-y-2">
       <div className="text-center">
         <p className="text-sm text-gray-500">
-          Created by{" "}
-          <a
-            href="https://balddata.xyz/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-gray-700 underline"
-          >
-            Bald Data
-          </a>{" "}
-          • Build:{" "}
+          Build:{" "}
           <span className="font-mono text-gray-600">
             {buildInfo.commitHash || "unknown"}
           </span>
