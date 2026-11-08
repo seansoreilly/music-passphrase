@@ -108,3 +108,12 @@ test('requestPhrases throws when every model fails', async () => {
   const f = fakeFetch([ok(''), ok('')]);
   await assert.rejects(requestPhrases('X', 10, { apiKey: 'k', fetchImpl: f.fn }), /All models failed/);
 });
+
+test('requestPhrases never logs the raw model response text', async (t) => {
+  const logged: string[] = [];
+  t.mock.method(console, 'log', (...args: unknown[]) => { logged.push(args.map(String).join(' ')); });
+  const f = fakeFetch([ok('SECRET-ECHO-OF-USER-INPUT\nLove Story')]);
+  await requestPhrases('Taylor Swift', 10, { apiKey: 'k', fetchImpl: f.fn });
+  assert.ok(logged.length > 0);
+  assert.ok(logged.every(line => !line.includes('SECRET-ECHO')), logged.join('\n'));
+});
