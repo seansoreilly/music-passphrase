@@ -151,7 +151,8 @@ export async function requestPhrases(
 
       const choice = data.choices?.[0];
       const content = choice?.message?.content ?? '';
-      console.log(`Raw ${model.id} response (finish=${choice?.finish_reason}):`, content);
+      // Log metadata only: the response is built from user input, so never log its text.
+      console.log(`${model.id} responded (finish=${choice?.finish_reason}, ${content.length} chars)`);
 
       const phrases = parsePhrases(content);
       if (phrases.length === 0) {

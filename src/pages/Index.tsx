@@ -247,6 +247,7 @@ const Index = () => {
                     id="keywords"
                     value={keywords}
                     onChange={(e) => setKeywords(e.target.value)}
+                    maxLength={100}
                     placeholder="Taylor Swift, The Beatles..."
                     className="h-14 pl-12 rounded-xl border-purple-200/60 bg-white/80 text-[1.15rem] focus:border-purple-300 focus:ring-purple-200 placeholder:text-purple-300/60"
                     disabled={mutation.isPending}
