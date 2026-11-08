@@ -36,7 +36,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(429).json({ error: 'Too many requests. Please wait a moment and try again.', success: false });
     }
 
-    const validation = validateRequestBody(req.body);
+    // @vercel/node parses the body lazily and its getter throws on malformed JSON;
+    // read it in its own guard so bad input is a 400, not the generic 500 below.
+    let body: unknown;
+    try {
+      body = req.body;
+    } catch {
+      return res.status(400).json({ error: 'Request body must be valid JSON', success: false });
+    }
+
+    const validation = validateRequestBody(body);
     if (!validation.ok) {
       return res.status(400).json({ error: validation.error, success: false });
     }
