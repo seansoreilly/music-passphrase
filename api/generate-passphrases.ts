@@ -1,5 +1,5 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { clientIp, createRateLimiter, validateRequestBody } from './_lib/request.js';
+import { allowedOrigin, clientIp, createRateLimiter, validateRequestBody } from './_lib/request.js';
 import { formatPassphrase, requestPhrases, targetPhraseLength } from './_lib/passphrase.js';
 
 const MAX_PASSPHRASE_LENGTH = Number(process.env.MAX_PASSPHRASE_LENGTH) || 40;
@@ -11,10 +11,15 @@ const MAX_PASSPHRASE_LENGTH = Number(process.env.MAX_PASSPHRASE_LENGTH) || 40;
 const rateLimiter = createRateLimiter({ limit: 10, windowMs: 60_000 });
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Enable CORS
-  // No Allow-Credentials: it is invalid with a wildcard origin and this API uses no cookies.
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  // CORS allowlist (no wildcard): this endpoint spends money on a paid LLM API, so other
+  // sites' browsers must not be able to call it. Same-origin requests need no CORS headers.
+  // No Allow-Credentials: the API uses no cookies.
+  const origin = allowedOrigin(req.headers.origin);
+  if (origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+  }
+  res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
   res.setHeader(
     'Access-Control-Allow-Headers',
     'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'

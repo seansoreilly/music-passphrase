@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { clientIp, createRateLimiter, MAX_KEYWORDS_LENGTH, validateRequestBody } from './request.ts';
+import { allowedOrigin, clientIp, createRateLimiter, MAX_KEYWORDS_LENGTH, validateRequestBody } from './request.ts';
 
 const valid = { keywords: ' Metallica ', addNumber: true, addSpecialChar: false, includeSpaces: true, length: 20 };
 
@@ -66,4 +66,11 @@ test('clientIp prefers the first X-Forwarded-For entry', () => {
   assert.equal(clientIp({ 'x-forwarded-for': '1.2.3.4, 10.0.0.1' }), '1.2.3.4');
   assert.equal(clientIp({ 'x-real-ip': '5.6.7.8' }), '5.6.7.8');
   assert.equal(clientIp({}), 'unknown');
+});
+
+test('allowedOrigin echoes only allowlisted origins', () => {
+  assert.equal(allowedOrigin('https://www.musicpassphrase.com'), 'https://www.musicpassphrase.com');
+  assert.equal(allowedOrigin('https://evil.example'), undefined);
+  assert.equal(allowedOrigin('https://musicpassphrase.com.evil.example'), undefined);
+  assert.equal(allowedOrigin(undefined), undefined);
 });
