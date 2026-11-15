@@ -103,3 +103,17 @@ export function clientIp(headers: Record<string, string | string[] | undefined>)
   const real = headers['x-real-ip'];
   return first || (Array.isArray(real) ? real[0] : real) || 'unknown';
 }
+
+export const ALLOWED_ORIGINS: readonly string[] = [
+  'https://musicpassphrase.com',
+  'https://www.musicpassphrase.com',
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://127.0.0.1:5173',
+];
+
+/** Returns the origin to echo in Access-Control-Allow-Origin, or undefined if not allowlisted. */
+export function allowedOrigin(origin: string | string[] | undefined): string | undefined {
+  const value = Array.isArray(origin) ? origin[0] : origin;
+  return value && ALLOWED_ORIGINS.includes(value) ? value : undefined;
+}
